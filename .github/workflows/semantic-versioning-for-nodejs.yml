@@ -38,7 +38,7 @@ jobs:
     name: Check for new changes
     runs-on: ubuntu-latest
 
-    if: ${{ github.ref == 'refs/heads/' + inputs.BRANCH_NAME }}
+    if: ${{ github.ref == format('refs/heads/{0}', inputs.BRANCH_NAME) }}
 
     outputs:
       LAST_VERSION: ${{ steps.get_version.outputs.LAST_VERSION }}
