@@ -72,13 +72,13 @@ jobs:
       - name: Check for unreleased commits
         id: check_commits_without_release
         run: |
-          COMMITS_WITHOUT_RELEASE=$(git log --left-only --right-only ${LAST_VERSION}..HEAD --no-merges --format=%H)
-          
+          COMMITS_WITHOUT_RELEASE=$(git log ${LAST_VERSION}..HEAD --no-merges --format=%H)
+
           if [ -n "$COMMITS_WITHOUT_RELEASE" ]; then
-            echo "There are commits without a release"
+            echo "Existem commits sem release"
             echo "::set-output name=COMMITS_WITHOUT_RELEASE::true"
           else
-            echo "There are no commits without a release"
+            echo "Não existem commits sem release"
             echo "::set-output name=COMMITS_WITHOUT_RELEASE::false"
           fi
 
@@ -95,7 +95,7 @@ jobs:
           IFS=',' read -r -a MINOR_TAG_LIST <<< "${{ inputs.MINOR_TAG_LIST }}"
           IFS=',' read -r -a PATH_TAG_LIST <<< "${{ inputs.PATH_TAG_LIST }}"
 
-          COMMITS_WITHOUT_RELEASE=$(git log --left-only --right-only ${LAST_VERSION}..HEAD --no-merges --format=%H)
+          COMMITS_WITHOUT_RELEASE=$(git log ${LAST_VERSION}..HEAD --no-merges --format=%H)
           COMMIT_MESSAGES=$(git log --format=%s $COMMITS_WITHOUT_RELEASE)
 
           for TAG in "${MAJOR_TAG_LIST[@]}"; do
