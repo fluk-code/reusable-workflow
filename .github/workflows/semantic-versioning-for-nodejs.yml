@@ -45,10 +45,18 @@ jobs:
       NEW_VERSION: ${{ steps.generate_tag_release.outputs.NEW_VERSION }}
 
     steps:
-      - name: Checkout
+      - name: Checkout With Package Token
+        if: ${{ secrets.PACKAGE_TOKEN != '' }} 
         uses: actions/checkout@v3
         with:
           token: ${{ secrets.PACKAGE_TOKEN }}
+          fetch-depth: 0
+          ref:  ${{ inputs.BRANCH_NAME }}
+
+      - name: Checkout Without Package Token
+        if: ${{ secrets.PACKAGE_TOKEN}} 
+        uses: actions/checkout@v3
+        with:
           fetch-depth: 0
           ref:  ${{ inputs.BRANCH_NAME }}
 
