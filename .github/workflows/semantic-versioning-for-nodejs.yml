@@ -8,6 +8,9 @@ on:
         required: false
 
     inputs:
+      USE_PACKAGE_TOKEN:
+        type: boolean
+        required: true
       BRANCH_NAME:
         type: string
         description: "Branch name"
@@ -46,9 +49,17 @@ jobs:
 
     steps:
       - name: Checkout With Package Token
+        if: ${{ inputs.USE_PACKAGE_TOKEN }}
         uses: actions/checkout@v3
         with:
-          token: ${{ secrets.PACKAGE_TOKEN || '' }}
+          token: ${{ secrets.PACKAGE_TOKEN }}
+          fetch-depth: 0
+          ref:  ${{ inputs.BRANCH_NAME }}
+
+      - name: Checkout Without Package Token
+        if: ${{ !inputs.USE_PACKAGE_TOKEN }}
+        uses: actions/checkout@v3
+        with:
           fetch-depth: 0
           ref:  ${{ inputs.BRANCH_NAME }}
 
