@@ -72,12 +72,16 @@ jobs:
       - name: Get Version from package.json
         id: get_version
         run: |
+          # Obter a versão do package.json
           VERSION=$(grep -o '"version": "[^"]*' package.json | cut -d'"' -f4)
-          echo "::set-output name=LAST_VERSION::$VERSION"
+          # Remover o prefixo se estiver presente
+          VERSION_NO_PREFIX="${VERSION#${{ inputs.TAG_PREFIX }}}"
+          echo "::set-output name=LAST_VERSION::$VERSION_NO_PREFIX"
 
       - name: Check for unreleased commits
         id: check_commits_without_release
         run: |
+          LAST_VERSION=${{ steps.get_version.outputs.LAST_VERSION }}
           COMMITS_WITHOUT_RELEASE=$(git log ${LAST_VERSION}..HEAD --no-merges --format=%H)
 
           if [ -n "$COMMITS_WITHOUT_RELEASE" ]; then
