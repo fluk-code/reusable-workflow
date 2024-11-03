@@ -95,19 +95,16 @@ jobs:
         id: get_commits
         run: |
           IS_FIRS_RELEASE=${{ env.IS_FIRST_RELEASE }}
-          echo $IS_FIRS_RELEASE
 
           if [ "$IS_FIRS_RELEASE" == "true" ]; then
             echo "First release."
             COMMITS=$(git log --format=%H)
             echo "$COMMITS=$COMMITS >> $GITHUB_ENV"
           else
-            CURRENT_VERSION=${{ env.CURRENT_VERSION }}
-            echo "current version $CURRENT_VERSION"
-
+            CURRENT_VERSION="${{ inputs.TAG_PREFIX }}${{ env.CURRENT_VERSION }}"
             COMMITS=$(git log ${CURRENT_VERSION}..HEAD --no-merges --format=%H)
 
-            echo "$COMMITS=$COMMITS >> $GITHUB_ENV"
+            echo "COMMITS=$COMMITS" >> $GITHUB_ENV
           fi
 
       - name: Generate tag release
