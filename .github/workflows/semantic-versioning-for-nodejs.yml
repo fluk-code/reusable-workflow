@@ -27,10 +27,21 @@ on:
         type: string
         description: "List of tags for PATCH changes, separated by commas"
         required: true
+      FILE_PATH:
+        type: string
+        description: "Path to the file containing the version"
+        required: true
+        default: "package.json"
+      VERSION_PATTERN:
+        type: string
+        description: "Pattern to match the version in the file"
+        required: true
+        default: '"version": "[^"]*'
       TAG_PREFIX:
         type: string
-        description: "Prefix for the version tag"
-        required: true  # Defina como true se você quiser torná-lo obrigatório
+        description: "Prefix for version tags"
+        required: false
+        default: "v"
 
     outputs:
       CURRENT_VERSION:
@@ -75,7 +86,10 @@ jobs:
           set -e
           set -o pipefail
 
-          VERSION=$(grep -o '"version": "[^"]*' package.json | cut -d'"' -f4)
+          FILE_PATH="${{ inputs.FILE_PATH }}"
+          VERSION_PATTERN="${{ inputs.VERSION_PATTERN }}"
+
+          VERSION=$(grep -o "$VERSION_PATTERN" "$FILE_PATH" | head -n 1 | cut -d'"' -f2)
           VERSION_NO_PREFIX="${VERSION#${{ inputs.TAG_PREFIX }}}"
 
           echo $VERSION_NO_PREFIX
@@ -150,9 +164,9 @@ jobs:
           fi
           
           if [ -z "$NEW_VERSION" ]; then
-            echo "No commit in this push will generate a new release."
-            exit 0
+            echo "HAS_CHANGES=false" >> $GITHUB_ENV
           fi
           
           echo "New version: $NEW_VERSION"
-          echo "::set-output name=NEW_VERSION::$NEW_VERSION"
+          echo "HAS_CHANGES=true" >> $GITHUB_ENV
+          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
