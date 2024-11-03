@@ -69,7 +69,7 @@ jobs:
           fetch-depth: 0
           ref:  ${{ inputs.BRANCH_NAME }}
 
-      - name: Get Version from package.json
+      - name: Get current version from package.json
         id: get_version
         run: |
           # Obter a versão do package.json
@@ -78,18 +78,31 @@ jobs:
           VERSION_NO_PREFIX="${VERSION#${{ inputs.TAG_PREFIX }}}"
           echo "::set-output name=LAST_VERSION::$VERSION_NO_PREFIX"
 
-      - name: Check for unreleased commits
-        id: check_commits_without_release
+      - name: Check is first release
+        id: check_is_first_release
         run: |
-          LAST_VERSION=${{ steps.get_version.outputs.LAST_VERSION }}
-          COMMITS_WITHOUT_RELEASE=$(git log ${LAST_VERSION}..HEAD --no-merges --format=%H)
-
-          if [ -n "$COMMITS_WITHOUT_RELEASE" ]; then
-            echo "Existem commits sem release"
-            echo "::set-output name=COMMITS_WITHOUT_RELEASE::true"
+          TAG_ALREADY_EXISTS=$(git tag --list)
+          if [ -z "$TAG_ALREADY_EXISTS" ]; then
+            echo "::set-output name=IS_FIRST_RELEASE::true"
           else
-            echo "Não existem commits sem release"
-            echo "::set-output name=COMMITS_WITHOUT_RELEASE::false"
+            echo "::set-output name=IS_FIRST_RELEASE::false"
+          fi
+      
+      - name: Get commits
+        id: get_commits
+        if: steps.check_is_first_release.outputs.TAG_ALREADY_EXISTS == 'true'
+        run: |
+          IS_FIRS_RELEASE=${{ steps.check_is_first_release.outputs.IS_FIRST_RELEASE }}
+
+          if [ "$IS_FIRS_RELEASE" == "true" ]; then
+            echo "First release."
+            COMMITS=$(git log --format=%H)
+            echo "::set-output name=COMMITS::$COMMITS"
+          else
+            echo "Old version: $LAST_VERSION"
+            LAST_VERSION=${{ steps.get_version.outputs.LAST_VERSION }}
+            COMMITS=$(git log ${LAST_VERSION}..HEAD --no-merges --format=%H)
+            echo "::set-output name=COMMITS::$COMMITS"
           fi
 
       - name: Generate tag release
@@ -105,8 +118,8 @@ jobs:
           IFS=',' read -r -a MINOR_TAG_LIST <<< "${{ inputs.MINOR_TAG_LIST }}"
           IFS=',' read -r -a PATH_TAG_LIST <<< "${{ inputs.PATH_TAG_LIST }}"
 
-          COMMITS_WITHOUT_RELEASE=$(git log ${LAST_VERSION}..HEAD --no-merges --format=%H)
-          COMMIT_MESSAGES=$(git log --format=%s $COMMITS_WITHOUT_RELEASE)
+          COMMITS=${{ steps.get_commits.outputs.COMMITS }}
+          COMMIT_MESSAGES=$(git log --format=%s $COMMITS)
 
           for TAG in "${MAJOR_TAG_LIST[@]}"; do
             if echo "$COMMIT_MESSAGES" | grep -Eq "(${TAG})(\([^)]*\))?!:"; then
