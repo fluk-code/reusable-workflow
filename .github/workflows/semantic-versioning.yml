@@ -31,17 +31,14 @@ on:
         type: string
         description: "Path to the file containing the version"
         required: true
-        default: "package.json"
       VERSION_PATTERN:
         type: string
         description: "Pattern to match the version in the file"
         required: true
-        default: '"version": "[^"]*'
       TAG_PREFIX:
         type: string
         description: "Prefix for version tags"
         required: false
-        default: "v"
 
     outputs:
       CURRENT_VERSION:
