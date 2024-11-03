@@ -79,16 +79,16 @@ jobs:
           VERSION_NO_PREFIX="${VERSION#${{ inputs.TAG_PREFIX }}}"
 
           echo $VERSION_NO_PREFIX
-          echo "$CURRENT_VERSION=$VERSION_NO_PREFIX >> $GITHUB_ENV"
+          echo "$CURRENT_VERSION=$VERSION_NO_PREFIX >> $GITHUB_STEP_SUMMARY"
 
       - name: Check is first release
         id: check_is_first_release
         run: |
           TAG_ALREADY_EXISTS=$(git tag --list)
           if [ -z "$TAG_ALREADY_EXISTS" ]; then
-            echo "$IS_FIRST_RELEASE="true" >> $GITHUB_ENV"
+            echo "$IS_FIRST_RELEASE=true >> $GITHUB_STEP_SUMMARY"
           else
-            echo "$IS_FIRST_RELEASE="false" >> $GITHUB_ENV"
+            echo "$IS_FIRST_RELEASE=false >> $GITHUB_STEP_SUMMARY"
           fi
       
       - name: Get commits
@@ -100,14 +100,14 @@ jobs:
           if [ "$IS_FIRS_RELEASE" == "true" ]; then
             echo "First release."
             COMMITS=$(git log --format=%H)
-            echo "$COMMITS=$COMMITS >> $GITHUB_ENV"
+            echo "$COMMITS=$COMMITS >> $GITHUB_STEP_SUMMARY"
           else
             CURRENT_VERSION=${{ steps.get_version.outputs.CURRENT_VERSION }}
             echo "current version $CURRENT_VERSION"
 
             COMMITS=$(git log ${CURRENT_VERSION}..HEAD --no-merges --format=%H)
 
-            echo "$COMMITS=$COMMITS >> $GITHUB_ENV"
+            echo "$COMMITS=$COMMITS >> $GITHUB_STEP_SUMMARY"
           fi
 
       - name: Generate tag release
