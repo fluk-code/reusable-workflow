@@ -73,6 +73,7 @@ jobs:
         id: get_version
         run: |
           set -e
+          set -o pipefail
 
           VERSION=$(grep -o '"version": "[^"]*' package.json | cut -d'"' -f4)
           VERSION_NO_PREFIX="${VERSION#${{ inputs.TAG_PREFIX }}}"
