@@ -103,7 +103,8 @@ jobs:
             CURRENT_VERSION="${{ inputs.TAG_PREFIX }}${{ env.CURRENT_VERSION }}"
             COMMITS=$(git log ${CURRENT_VERSION}..HEAD --no-merges --format=%H)
           fi
-          
+
+          COMMITS=$(echo "$COMMITS" | tr '\n' ',')
           echo "COMMITS=$COMMITS" >> $GITHUB_ENV
 
       - name: Generate tag release
