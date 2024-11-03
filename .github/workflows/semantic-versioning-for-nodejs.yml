@@ -99,13 +99,12 @@ jobs:
           if [ "$IS_FIRS_RELEASE" == "true" ]; then
             echo "First release."
             COMMITS=$(git log --format=%H)
-            echo "$COMMITS=$COMMITS >> $GITHUB_ENV"
           else
             CURRENT_VERSION="${{ inputs.TAG_PREFIX }}${{ env.CURRENT_VERSION }}"
             COMMITS=$(git log ${CURRENT_VERSION}..HEAD --no-merges --format=%H)
-
-            echo "COMMITS=$COMMITS" >> $GITHUB_ENV
           fi
+          
+          echo "COMMITS=$COMMITS" >> $GITHUB_ENV
 
       - name: Generate tag release
         id: generate_tag_release
