@@ -83,11 +83,11 @@ jobs:
           set -e
           set -o pipefail
 
-          FILE_PATH=${{ inputs.FILE_PATH }}
-          VERSION_PATTERN='${{ inputs.VERSION_PATTERN }}'
+          FILE_PATH="${{ inputs.FILE_PATH }}"
+          VERSION_PATTERN="${{ inputs.VERSION_PATTERN }}"
 
-          VERSION=$(grep -o "$VERSION_PATTERN" "$FILE_PATH" | head -n 1 | cut -d'"' -f2)
-          VERSION_NO_PREFIX="${VERSION#${{ inputs.TAG_PREFIX }}}"
+          VERSION=$(grep -o "$VERSION_PATTERN" "$FILE_PATH" | head -n 1 | cut -d'"' -f4)
+          VERSION_NO_PREFIX="${VERSION#v}"
 
           echo $VERSION_NO_PREFIX
           echo "CURRENT_VERSION=$VERSION_NO_PREFIX" >> $GITHUB_ENV
