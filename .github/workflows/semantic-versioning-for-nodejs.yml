@@ -86,9 +86,9 @@ jobs:
         run: |
           TAG_ALREADY_EXISTS=$(git tag --list)
           if [ -z "$TAG_ALREADY_EXISTS" ]; then
-            echo "$IS_FIRST_RELEASE=true >> $GITHUB_ENV"
+            echo "$IS_FIRST_RELEASE="true" >> $GITHUB_ENV"
           else
-            echo "$IS_FIRST_RELEASE=false >> $GITHUB_ENV"
+            echo "$IS_FIRST_RELEASE="false" >> $GITHUB_ENV"
           fi
       
       - name: Get commits
