@@ -109,9 +109,9 @@ jobs:
 
       - name: Generate tag release
         id: generate_tag_release
-        if: steps.check_commits_without_release.outputs.COMMITS != ''
+        if: ${{ env.COMMITS != '' }}
         run: |
-          CURRENT_VERSION=${{ steps.get_version.outputs.CURRENT_VERSION }}
+          CURRENT_VERSION=${{ env.CURRENT_VERSION }}
           LAST_MAJOR_VERSION=$(echo "$CURRENT_VERSION" | cut -d. -f1)
           LAST_MINOR_VERSION=$(echo "$CURRENT_VERSION" | cut -d. -f2)
           LAST_PATCH_VERSION=$(echo "$CURRENT_VERSION" | cut -d. -f3)
@@ -120,7 +120,8 @@ jobs:
           IFS=',' read -r -a MINOR_TAG_LIST <<< "${{ inputs.MINOR_TAG_LIST }}"
           IFS=',' read -r -a PATH_TAG_LIST <<< "${{ inputs.PATH_TAG_LIST }}"
 
-          COMMITS=${{ steps.get_commits.outputs.COMMITS }}
+          COMMITS=${{ env.COMMITS }}
+          COMMITS=$(echo "$COMMITS" | tr ',' '\n')
           COMMIT_MESSAGES=$(git log --format=%s $COMMITS)
 
           for TAG in "${MAJOR_TAG_LIST[@]}"; do
