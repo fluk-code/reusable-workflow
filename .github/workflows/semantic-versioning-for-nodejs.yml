@@ -72,10 +72,11 @@ jobs:
       - name: Get current version from package.json
         id: get_version
         run: |
-          # Obter a versão do package.json
+          set -e
+
           VERSION=$(grep -o '"version": "[^"]*' package.json | cut -d'"' -f4)
-          # Remover o prefixo se estiver presente
           VERSION_NO_PREFIX="${VERSION#${{ inputs.TAG_PREFIX }}}"
+
           echo $VERSION_NO_PREFIX
           echo "$CURRENT_VERSION=$VERSION_NO_PREFIX >> $GITHUB_ENV"
 
