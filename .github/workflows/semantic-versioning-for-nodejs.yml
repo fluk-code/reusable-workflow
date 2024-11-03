@@ -90,7 +90,6 @@ jobs:
       
       - name: Get commits
         id: get_commits
-        if: steps.check_is_first_release.outputs.TAG_ALREADY_EXISTS == 'true'
         run: |
           IS_FIRS_RELEASE=${{ steps.check_is_first_release.outputs.IS_FIRST_RELEASE }}
 
@@ -107,7 +106,7 @@ jobs:
 
       - name: Generate tag release
         id: generate_tag_release
-        if: steps.check_commits_without_release.outputs.COMMITS_WITHOUT_RELEASE == 'true'
+        if: steps.check_commits_without_release.outputs.COMMITS != ''
         run: |
           LAST_VERSION=${{ steps.get_version.outputs.LAST_VERSION }}
           LAST_MAJOR_VERSION=$(echo "$LAST_VERSION" | cut -d. -f1)
